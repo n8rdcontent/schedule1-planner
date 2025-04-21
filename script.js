@@ -1,14 +1,126 @@
 const canvas = document.getElementById("planner-canvas");
 const ctx = canvas.getContext("2d");
+const shapeOptions = document.querySelectorAll(".shape-option");
+const layoutSelector = document.getElementById("layout-selector");
 
-const gridSize = 40;
-const gridWidth = Math.floor(canvas.width / gridSize);
-const gridHeight = Math.floor(canvas.height / gridSize);
-const placedObjects = [];
+// Grid configuration
+const gridSize = 30;
+const canvasWidth = 810;
+const canvasHeight = 810;
+const gridWidth = canvasWidth / gridSize;
+const gridHeight = canvasHeight / gridSize;
+
+// State variables
+let placedObjects = [];
 let hoverCell = { x: -1, y: -1 };
 let isRotated = false;
-const baseWidth = 4; // Original width (4 grid cells)
-const baseHeight = 3; // Original height (3 grid cells)
+let baseWidth = 2;
+let baseHeight = 2;
+let currentShapeName = "Pot or Grow tent";
+
+// Object type colors
+const objectColors = {
+    "Pot or Grow tent": "#5a915d", // Green
+    "Packing Station": "#8a6d3b", // Brown
+    "Bed": "#7b6888", // Purple
+    "Large Storage Rack": "#a87c6f", // Tan
+    "Medium Storage Rack": "#a87c6f", // Tan
+    "Small Storage Rack": "#a87c6f", // Tan
+    "Trash Can": "#666666", // Gray
+    "Mixing Station": "#d0738c", // Pink
+    "Drying Rack": "#d0a38c", // Light brown
+    "Brick Press": "#8c9fd0", // Blue
+    "Chemistry Station": "#d08cbc", // Light purple
+    "Lab Oven": "#d08c8c", // Red
+    "Cauldron": "#8cbcd0" // Teal
+};
+
+// Layout Templates
+const layoutTemplates = {
+    empty: {
+        name: "Empty Grid",
+        grid: []
+    },
+    bungalow: {
+        name: "Bungalow Layout",
+        grid: [
+            // Outer walls
+            {x: 0, y: 0, w: 13, h: 1, rotated: false, fixed: true},
+            {x: 13, y: 0, w: 14, h: 14, rotated: false, fixed: true},
+            {x: 0, y: 1, w: 1, h: 26, rotated: false, fixed: true},
+            {x: 26, y: 14, w: 1, h: 13, rotated: false, fixed: true},
+            {x: 1, y: 26, w: 25, h: 1, rotated: false, fixed: true},
+            {x: 16, y: 14, w: 2, h: 2, rotated: false, fixed: true},
+            {x: 13, y: 14, w: 1, h: 1, rotated: false, fixed: true},
+            {x: 13, y: 17, w: 1, h: 6, rotated: false, fixed: true},
+            {x: 13, y: 25, w: 1, h: 1, rotated: false, fixed: true},
+            {x: 1, y: 13, w: 12, h: 1, rotated: false, fixed: true},
+            {x: 6, y: 11, w: 2, h: 5, rotated: false, fixed: true},
+            // Central blocks
+            {x: 1, y: 21, w: 2, h: 5, rotated: false, fixed: true},
+            {x: 3, y: 24, w: 6, h: 2, rotated: false, fixed: true}
+        ]
+    },
+    stadium: {
+        name: "Stadium Layout",
+        grid: [
+            // Outer walls
+            {x: 0, y: 0, w: 20, h: 1, rotated: false, fixed: true},
+            {x: 0, y: 14, w: 20, h: 1, rotated: false, fixed: true},
+            {x: 0, y: 1, w: 1, h: 13, rotated: false, fixed: true},
+            {x: 19, y: 1, w: 1, h: 13, rotated: false, fixed: true},
+            // Central pitch
+            {x: 6, y: 4, w: 8, h: 6, rotated: false, fixed: true}
+        ]
+    },
+    divided: {
+        name: "Divided Layout",
+        grid: [
+            // Outer walls
+            {x: 0, y: 0, w: 20, h: 1, rotated: false, fixed: true},
+            {x: 0, y: 14, w: 20, h: 1, rotated: false, fixed: true},
+            {x: 0, y: 1, w: 1, h: 13, rotated: false, fixed: true},
+            {x: 19, y: 1, w: 1, h: 13, rotated: false, fixed: true},
+            // Dividing walls
+            {x: 7, y: 1, w: 1, h: 13, rotated: false, fixed: true},
+            {x: 13, y: 1, w: 1, h: 13, rotated: false, fixed: true}
+        ]
+    }
+};
+
+// Initialize canvas
+canvas.width = canvasWidth;
+canvas.height = canvasHeight;
+
+// Shape selection
+shapeOptions.forEach(option => {
+    option.addEventListener("click", () => {
+        shapeOptions.forEach(opt => opt.classList.remove("selected"));
+        option.classList.add("selected");
+        baseWidth = parseInt(option.dataset.width);
+        baseHeight = parseInt(option.dataset.height);
+        currentShapeName = option.textContent;
+        drawGrid();
+    });
+});
+
+// Layout selection
+layoutSelector.addEventListener("change", () => {
+    const selectedLayout = layoutSelector.value;
+    applyLayout(selectedLayout);
+});
+
+function applyLayout(layoutName) {
+    // Clear existing fixed objects
+    placedObjects = placedObjects.filter(obj => !obj.fixed);
+    
+    // Add new layout objects if not empty
+    if (layoutName !== "empty" && layoutTemplates[layoutName]) {
+        placedObjects.push(...JSON.parse(JSON.stringify(layoutTemplates[layoutName].grid)));
+    }
+    
+    drawGrid();
+}
 
 function drawGrid() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -16,12 +128,16 @@ function drawGrid() {
     // Draw grid lines
     ctx.strokeStyle = "#555";
     ctx.lineWidth = 1;
+    
+    // Vertical lines
     for (let x = 0; x <= canvas.width; x += gridSize) {
         ctx.beginPath();
         ctx.moveTo(x + 0.5, 0);
         ctx.lineTo(x + 0.5, canvas.height);
         ctx.stroke();
     }
+    
+    // Horizontal lines
     for (let y = 0; y <= canvas.height; y += gridSize) {
         ctx.beginPath();
         ctx.moveTo(0, y + 0.5);
@@ -29,33 +145,10 @@ function drawGrid() {
         ctx.stroke();
     }
 
-    // Draw placed objects
+    // Draw placed objects with their specific colors
     for (const obj of placedObjects) {
-        ctx.fillStyle = "#4caf50";
-        if (obj.rotated) {
-            // Draw rotated (3x4)
-            ctx.save();
-            ctx.translate(
-                obj.x * gridSize + (baseHeight * gridSize) / 2,
-                obj.y * gridSize + (baseWidth * gridSize) / 2
-            );
-            ctx.rotate(Math.PI / 2);
-            ctx.fillRect(
-                (-baseWidth * gridSize) / 2,
-                (-baseHeight * gridSize) / 2,
-                baseWidth * gridSize,
-                baseHeight * gridSize
-            );
-            ctx.restore();
-        } else {
-            // Draw normal (4x3)
-            ctx.fillRect(
-                obj.x * gridSize,
-                obj.y * gridSize,
-                baseWidth * gridSize,
-                baseHeight * gridSize
-            );
-        }
+        const color = obj.fixed ? "#6a6a6a" : (objectColors[obj.name] || "#5a915d");
+        drawObject(obj.x, obj.y, obj.w, obj.h, obj.rotated, false, color, obj.fixed);
     }
 
     // Draw hover preview
@@ -63,34 +156,73 @@ function drawGrid() {
         const displayWidth = isRotated ? baseHeight : baseWidth;
         const displayHeight = isRotated ? baseWidth : baseHeight;
         
-        // Check if placement would be out of bounds
-        const outOfBounds = hoverCell.x + displayWidth > gridWidth || 
+        const outOfBounds = hoverCell.x < 0 || 
+                          hoverCell.y < 0 ||
+                          hoverCell.x + displayWidth > gridWidth || 
                           hoverCell.y + displayHeight > gridHeight;
         
         const canPlace = !outOfBounds && !checkOverlap(hoverCell.x, hoverCell.y, displayWidth, displayHeight);
         
-        ctx.fillStyle = canPlace ? "rgba(76, 175, 80, 0.5)" : "rgba(255, 0, 0, 0.5)";
+        drawObject(
+            hoverCell.x, 
+            hoverCell.y, 
+            baseWidth, 
+            baseHeight, 
+            isRotated, 
+            true, 
+            canPlace ? "rgba(76, 175, 80, 0.5)" : "rgba(255, 0, 0, 0.5)"
+        );
+    }
+}
+
+function drawObject(x, y, w, h, rotated, isPreview, fillColor, isFixed = false) {
+    const outline = isFixed ? "#444" : "rgb(0, 0, 0)";
+    
+    if (rotated) {
+        ctx.save();
+        ctx.translate(
+            x * gridSize + (h * gridSize) / 2,
+            y * gridSize + (w * gridSize) / 2
+        );
+        ctx.rotate(Math.PI / 2);
         
-        if (isRotated) {
-            ctx.save();
-            ctx.translate(
-                hoverCell.x * gridSize + (baseHeight * gridSize) / 2,
-                hoverCell.y * gridSize + (baseWidth * gridSize) / 2
+        ctx.fillStyle = fillColor;
+        ctx.fillRect(
+            (-w * gridSize) / 2,
+            (-h * gridSize) / 2,
+            w * gridSize,
+            h * gridSize
+        );
+        
+        if (!isPreview) {
+            ctx.strokeStyle = outline;
+            ctx.lineWidth = 2;
+            ctx.strokeRect(
+                (-w * gridSize) / 2,
+                (-h * gridSize) / 2,
+                w * gridSize,
+                h * gridSize
             );
-            ctx.rotate(Math.PI / 2);
-            ctx.fillRect(
-                (-baseWidth * gridSize) / 2,
-                (-baseHeight * gridSize) / 2,
-                baseWidth * gridSize,
-                baseHeight * gridSize
-            );
-            ctx.restore();
-        } else {
-            ctx.fillRect(
-                hoverCell.x * gridSize,
-                hoverCell.y * gridSize,
-                baseWidth * gridSize,
-                baseHeight * gridSize
+        }
+        
+        ctx.restore();
+    } else {
+        ctx.fillStyle = fillColor;
+        ctx.fillRect(
+            x * gridSize,
+            y * gridSize,
+            w * gridSize,
+            h * gridSize
+        );
+        
+        if (!isPreview) {
+            ctx.strokeStyle = outline;
+            ctx.lineWidth = 2;
+            ctx.strokeRect(
+                x * gridSize,
+                y * gridSize,
+                w * gridSize,
+                h * gridSize
             );
         }
     }
@@ -98,8 +230,8 @@ function drawGrid() {
 
 function checkOverlap(x, y, w, h) {
     for (const obj of placedObjects) {
-        const objW = obj.rotated ? baseHeight : baseWidth;
-        const objH = obj.rotated ? baseWidth : baseHeight;
+        const objW = obj.rotated ? obj.h : obj.w;
+        const objH = obj.rotated ? obj.w : obj.h;
         
         if (x < obj.x + objW &&
             x + w > obj.x &&
@@ -111,58 +243,68 @@ function checkOverlap(x, y, w, h) {
     return false;
 }
 
-function isPlacementValid(x, y, w, h) {
-    // Check if within grid bounds
-    if (x + w > gridWidth || y + h > gridHeight) {
-        return false;
-    }
-    // Check for overlaps
-    return !checkOverlap(x, y, w, h);
-}
-
 canvas.addEventListener("mousemove", (e) => {
     const rect = canvas.getBoundingClientRect();
-    hoverCell = {
-        x: Math.floor((e.clientX - rect.left) / gridSize),
-        y: Math.floor((e.clientY - rect.top) / gridSize)
-    };
-    drawGrid();
-});
-
-canvas.addEventListener("click", (e) => {
-    if (!e.shiftKey) {
-        // Place object only if valid position
-        const displayWidth = isRotated ? baseHeight : baseWidth;
-        const displayHeight = isRotated ? baseWidth : baseHeight;
-        
-        if (isPlacementValid(hoverCell.x, hoverCell.y, displayWidth, displayHeight)) {
-            placedObjects.push({
-                x: hoverCell.x,
-                y: hoverCell.y,
-                w: baseWidth,
-                h: baseHeight,
-                rotated: isRotated
-            });
-            drawGrid();
-        }
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    
+    if (mouseX >= 0 && mouseX < canvas.width && mouseY >= 0 && mouseY < canvas.height) {
+        hoverCell = {
+            x: Math.floor(mouseX / gridSize),
+            y: Math.floor(mouseY / gridSize)
+        };
+        drawGrid();
+    } else {
+        hoverCell = { x: -1, y: -1 };
+        drawGrid();
     }
 });
 
-// Handle both delete and rotation
 canvas.addEventListener("click", (e) => {
-    if (e.shiftKey) {
-        // Delete object
-        const index = placedObjects.findIndex(obj => {
-            const objW = obj.rotated ? baseHeight : baseWidth;
-            const objH = obj.rotated ? baseWidth : baseHeight;
-            return hoverCell.x >= obj.x &&
-                   hoverCell.x < obj.x + objW &&
-                   hoverCell.y >= obj.y &&
-                   hoverCell.y < obj.y + objH;
-        });
-        if (index !== -1) {
-            placedObjects.splice(index, 1);
-            drawGrid();
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    
+    if (mouseX >= 0 && mouseX < canvas.width && mouseY >= 0 && mouseY < canvas.height) {
+        const gridX = Math.floor(mouseX / gridSize);
+        const gridY = Math.floor(mouseY / gridSize);
+        
+        if (e.shiftKey) {
+            // Delete object (but not fixed ones)
+            const index = placedObjects.findIndex(obj => {
+                if (obj.fixed) return false;
+                
+                const objW = obj.rotated ? obj.h : obj.w;
+                const objH = obj.rotated ? obj.w : obj.h;
+                return gridX >= obj.x &&
+                       gridX < obj.x + objW &&
+                       gridY >= obj.y &&
+                       gridY < obj.y + objH;
+            });
+            if (index !== -1) {
+                placedObjects.splice(index, 1);
+                drawGrid();
+            }
+        } else {
+            // Place object
+            const displayWidth = isRotated ? baseHeight : baseWidth;
+            const displayHeight = isRotated ? baseWidth : baseHeight;
+            
+            if (gridX >= 0 && gridY >= 0 &&
+                gridX + displayWidth <= gridWidth &&
+                gridY + displayHeight <= gridHeight &&
+                !checkOverlap(gridX, gridY, displayWidth, displayHeight)) {
+                placedObjects.push({
+                    x: gridX,
+                    y: gridY,
+                    w: baseWidth,
+                    h: baseHeight,
+                    rotated: isRotated,
+                    fixed: false,
+                    name: currentShapeName
+                });
+                drawGrid();
+            }
         }
     }
 });
@@ -179,5 +321,5 @@ canvas.addEventListener("mouseleave", () => {
     drawGrid();
 });
 
-// Initialize
-drawGrid();
+// Initialize with empty grid
+applyLayout("empty");

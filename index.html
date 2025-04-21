@@ -1,17 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Schedule I Property Planner</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule I Property Planner</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Schedule I Property Planner</h1>
-    <div id="canvas-wrapper">
-      <canvas id="planner-canvas" width="800" height="600"></canvas>
+    <header>
+        <h1>Schedule I Property Planner</h1>
+    </header>
+    
+    <div id="main-content">
+        <div id="controls-panel">
+            <div id="shape-panel">
+                <h2>Select Shape</h2>
+                <div class="shape-option selected" data-width="2" data-height="2">Pot or Grow tent</div>
+                <div class="shape-option" data-width="4" data-height="2">Packing Station</div>
+                <div class="shape-option" data-width="3" data-height="4">Bed</div>
+                <div class="shape-option" data-width="4" data-height="1">Large Storage Rack</div>
+                <div class="shape-option" data-width="3" data-height="1">Medium Storage Rack</div>
+                <div class="shape-option" data-width="2" data-height="1">Small Storage Rack</div>
+                <div class="shape-option" data-width="2" data-height="2">Trash Can</div>
+                <div class="shape-option" data-width="4" data-height="2">Mixing Station</div>
+                <div class="shape-option" data-width="3" data-height="2">Drying Rack</div>
+                <div class="shape-option" data-width="2" data-height="2">Brick Press</div>
+                <div class="shape-option" data-width="4" data-height="2">Chemistry Station</div>
+                <div class="shape-option" data-width="4" data-height="2">Lab Oven</div>
+                <div class="shape-option" data-width="4" data-height="4">Cauldron</div>
+            </div>
+            
+            <div id="layout-panel">
+                <h2>Select Layout</h2>
+                <select id="layout-selector">
+                    <option value="empty">Empty Grid</option>
+                    <option value="bungalow">Bungalow</option>
+                    <option value="stadium">Stadium Layout</option>
+                    <option value="divided">Divided Layout</option>
+                </select>
+            </div>
+        </div>
+        
+        <div id="canvas-container">
+            <canvas id="planner-canvas" width="800" height="600"></canvas>
+        </div>
     </div>
+
     <script src="script.js"></script>
-  </body>
-  
+</body>
 </html>

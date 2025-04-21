@@ -1,27 +1,108 @@
 body {
-    font-family: Arial, sans-serif;
-    background-color: #111;
-    color: #fff;
-    text-align: center;
-    margin: 0;
-    padding: 0;
+  font-family: Arial, sans-serif;
+  background-color: #111;
+  color: #fff;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background-color: #1a1a1a;
+  padding: 15px 0;
+  position: relative;
+  z-index: 10;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+h1 {
+  margin: 0;
+  text-align: center;
+  padding: 0 20px;
+}
+
+#main-content {
+  display: flex;
+  flex: 1;
+  padding: 20px;
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#controls-panel {
+  width: 250px;
+  background-color: #222;
+  border-radius: 8px;
+  padding: 20px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+#shape-panel h2, #layout-panel h2 {
+  margin-top: 0;
+  border-bottom: 1px solid #444;
+  padding-bottom: 10px;
+}
+
+.shape-option {
+  padding: 12px;
+  margin: 8px 0;
+  background-color: #333;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.shape-option:hover {
+  background-color: #444;
+  transform: translateX(3px);
+}
+
+.shape-option.selected {
+  background-color: #5a915d;
+  font-weight: bold;
+}
+
+#layout-selector {
+  width: 100%;
+  padding: 8px;
+  background-color: #333;
+  color: white;
+  border: 1px solid #444;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#canvas-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+canvas {
+  background-color: #1e1e1e;
+  border: 2px solid #444;
+  box-shadow: 0 0 10px #000;
+  cursor: crosshair;
+}
+
+@media (max-width: 768px) {
+  #main-content {
+      flex-direction: column;
+      align-items: center;
   }
   
-  h1 {
-    margin-top: 20px;
+  #controls-panel {
+      width: 100%;
+      max-width: 400px;
   }
-  
-  #canvas-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: calc(100vh - 80px);
-  }
-  
-  canvas {
-    background-color: #1e1e1e;
-    border: 2px solid #444;
-    box-shadow: 0 0 10px #000;
-    cursor: crosshair;
-  }
-  
+}
