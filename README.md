@@ -29,6 +29,8 @@ Visit https://n8rdcontent.github.io/schedule1-planner/ to use the property plann
 - Cost Calculator
 
 - Support for multiple Stories (Example: Barn or Warehouse)
+
+- Controls (Window showing Controls)
 ## Author
 
 [@n8rd](https://github.com/n8rdcontent)
