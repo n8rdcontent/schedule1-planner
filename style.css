@@ -71,13 +71,25 @@ h1 {
 }
 
 #layout-selector {
-  width: 100%;
-  padding: 8px;
+  padding: 12px;
+  margin: 8px 0;
   background-color: #333;
-  color: white;
-  border: 1px solid #444;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
+  transition: all 0.2s ease;
+  color: white;
+}
+
+#layout-selector:hover {
+  background-color: #444;
+  transform: translateX(3px);
+
+}
+
+#layout-selector:focus {
+  outline: none;
+  border-color: #6bb870;
+  box-shadow: 0 0 0 2px rgba(106, 175, 80, 0.3);
 }
 
 #canvas-container {
@@ -106,3 +118,148 @@ canvas {
       max-width: 400px;
   }
 }
+#floor-panel {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #444;
+}
+
+#floor-panel h2 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 1.1em;
+  color: #ddd;
+}
+
+#floor-selector {
+  padding: 12px;
+  margin: 8px 0;
+  background-color: #333;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: white;
+}
+
+#floor-selector:hover {
+  background-color: #444;
+  transform: translateX(3px);
+}
+
+#floor-selector:focus {
+  outline: none;
+  border-color: #6bb870;
+  box-shadow: 0 0 0 2px rgba(106, 175, 80, 0.3);
+}
+
+#action-buttons {
+  padding: 12px;
+  margin: 8px 0;
+  background-color: #333;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.action-button {
+  padding: 12px;
+  margin: 8px 0;
+  background-color: #333;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: white;
+  
+  
+  text-align: left;
+
+
+  border: 1px solid #79a84d;
+  border-radius: 4px;
+}
+
+.action-button:hover {
+  background-color: #444;
+  transform: translateX(3px);
+}
+
+.action-button:active {
+  transform: translateY(1px);
+}
+
+#main-content {
+  display: flex;
+  flex: 1;
+  padding: 20px;
+  gap: 20px;
+  max-width: 1400px; /* Increased to accommodate right panel */
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#left-panel {
+  width: 250px;
+  display: flex;
+  flex-direction: column;
+}
+
+#canvas-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+#right-panel {
+  width: 250px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Cost Calculator Styles */
+#cost-calculator {
+  background-color: #222;
+  padding: 15px;
+  border-radius: 8px;
+  height: calc(100vh - 200px);
+  overflow-y: auto;
+}
+
+#cost-calculator h2 {
+  margin-top: 0;
+  border-bottom: 1px solid #444;
+  padding-bottom: 10px;
+}
+
+.cost-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+  padding: 5px;
+  background-color: #333;
+  border-radius: 4px;
+}
+
+.total-cost {
+  font-weight: bold;
+  font-size: 1.2em;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #444;
+}
+
+/* Controls Panel Styles */
+#controls-panel {
+  background-color: #222;
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  height: calc(100vh - 200px);
+  overflow-y: auto;
+}
+
+/* Keep all your existing styles for shape options, buttons, etc. */
